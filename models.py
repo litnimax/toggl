@@ -11,6 +11,21 @@ class res_users(models.Model):
     toggl_key = fields.Char(string='Toggl API Key')
 
 
+class Toggl(models.Model):
+    _name = 'toggl.toggl'
+
+    toggl_key = fields.Char(string='Toggl API Key')
+
+
+class LandingReport(models.AbstractModel):
+    _name = 'report.toggl.landing'
+
+    @api.multi
+    def render_html(self, data=None):
+        report_obj = self.env['report']
+        return report_obj.render('toggl.landing', {})
+
+
 class DayReport(models.AbstractModel):
     _name = 'report.toggl.day_summary'
 
