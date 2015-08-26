@@ -47,12 +47,15 @@ def get_dashboard():
         project_ids[proj['id']] = proj['name']
 
     for a in dash['activity']:
+        duration = int(a['duration'])
+        if duration < 0:
+            duration = 0
         data.append({
             'user': user_ids[a['user_id']],
             'project': project_ids[a['project_id']] if a['project_id'] else '',
             'description': a['description'],
-            'duration': str(timedelta(seconds=int(a['duration']))),
-            'stop': re_date.search(a['stop']).group(1),
+            'duration': str(timedelta(seconds=duration)),
+            'stop': a['stop'] and re_date.search(a['stop']) and re_date.search(a['stop']).group(1) or '',
             })
     # We've got timeline from new to old, reverse it.
     data.reverse()
@@ -80,4 +83,4 @@ def get_summary(day):
 if __name__ == '__main__':
     d =  get_dashboard()
     for l in d:
-        print l['duration'], l['stop']
+        print l['description'], l['duration'], l['stop']
