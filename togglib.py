@@ -35,9 +35,18 @@ def req(url):
 
 def format_time(t):
     if not t or not re_date.search(t):
-        return '0:00:00'
+        return ''
     else:
         return re_date.search(t).group(1)
+
+def calculate_duration(d):
+        duration = int(d)
+        if duration > 0:
+            return str(timedelta(seconds=duration))
+        else:
+            duration = abs(duration)
+            seconds = int(time.time() - duration)
+            return str(timedelta(seconds=seconds))
 
 
 def get_dashboard():
@@ -54,12 +63,11 @@ def get_dashboard():
         project_ids[proj['id']] = proj['name']
 
     for a in dash['activity']:
-        duration = abs(int(a['duration']))
         data.append({
             'user': user_ids[a['user_id']],
             'project': project_ids[a['project_id']] if a['project_id'] else '',
             'description': a['description'],
-            'duration': str(timedelta(seconds=duration)),
+            'duration': calculate_duration(a['duration']),
             'stop': format_time(a['stop']),
             })
     # We've got timeline from new to old, reverse it.
@@ -69,7 +77,7 @@ def get_dashboard():
 
 def get_summary(day):
     recs = req(TODAY_SUMMARY % {'workspace': WORKSPACE, 'today': day})
-    #print json.dumps(recs, indent=4, sort_keys=True)
+    print json.dumps(recs, indent=4, sort_keys=True)
     data = []
     for rec in recs['data']:
         user = rec['title']['user']
@@ -98,14 +106,9 @@ def get_current(api_token):
                 'state': 'Error'
             }
         description = data['description']
+        state = 'Running' if int(data['duration']) < 0 else 'Stopped'
         # Format duration
-        duration = int(data['duration'])
-        duration = int(data['duration'])
-        state = 'Running' if duration < 0 else 'Stopped'
-        duration = abs(duration)
-        duration = int(time.time()) - duration
-        duration = str(timedelta(seconds=duration))
-
+        duration = calculate_duration(data['duration'])
         start = format_time(data['start'])
         
         return {
@@ -119,4 +122,5 @@ def get_current(api_token):
 
 
 if __name__ == '__main__':
-    print json.dumps(get_current('aa2520b5583e11b421e7d0c203978a43'), indent=4)
+    #print json.dumps(get_current('aa2520b5583e11b421e7d0c203978a43'), indent=4)
+    print get_summary('2015-08-25')

@@ -11,12 +11,6 @@ class res_users(models.Model):
     toggl_key = fields.Char(string='Toggl API Key')
 
 
-class Toggl(models.Model):
-    _name = 'toggl.toggl'
-
-    toggl_key = fields.Char(string='Toggl API Key')
-
-
 class LandingReport(models.AbstractModel):
     _name = 'report.toggl.landing'
 
