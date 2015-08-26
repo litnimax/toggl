@@ -9,6 +9,8 @@
     </record>
 
     <menuitem id='toggl_menu' parent='base.menu_main_pm' name='Toggl'/>
+    <menuitem id='toggl_summary' parent='toggl_menu' name='Daily Summary'/>
+    <menuitem id='toggl_dashboard' parent='toggl_menu' name='Dashboard'/>
 
 
 <template id="summary">
