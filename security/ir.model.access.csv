@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_toggl_day_summary,toggl.day_summary,model_report_toggl_day_summary,project.group_project_user,1,0,0,0
-access_toggl_yesterday_summary,toggl.yesterday_summary,model_report_toggl_yesterday_summary,project.group_project_user,1,0,0,0
-access_toggl_dashboard,toggl.dashboard,model_report_toggl_dashboard,project.group_project_user,1,0,0,0
-access_toggl_current,toggl.current,model_report_toggl_current,project.group_project_user,1,0,0,0
+access_toggl_day_summary,toggl.day_summary,model_report_toggl_day_summary,,1,0,0,0
+access_toggl_yesterday_summary,toggl.yesterday_summary,model_report_toggl_yesterday_summary,,1,0,0,0
+access_toggl_dashboard,toggl.dashboard,model_report_toggl_dashboard,,1,0,0,0
+access_toggl_current,toggl.current,model_report_toggl_current,,1,0,0,0
