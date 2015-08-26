@@ -1,76 +1,162 @@
 <openerp>
     <data>
 
-    <record id='toggl_summary_report' model='ir.actions.report.xml'>
-        <field name='model'>report.toggl.summary</field>
+    <record id='toggl_day_summary_report' model='ir.actions.report.xml'>
+        <field name='model'>report.toggl.day_summary</field>
         <field name='report_type'>qweb-html</field>
-        <field name='report_name'>toggl.summary</field>
-        <field name='name'>toggl.summary</field>
+        <field name='report_name'>toggl.day_summary</field>
+        <field name='name'>toggl.day_summary</field>
+    </record>
+    <record id='toggl_yesterday_summary_report' model='ir.actions.report.xml'>
+        <field name='model'>report.toggl.yesterday_summary</field>
+        <field name='report_type'>qweb-html</field>
+        <field name='report_name'>toggl.yesterday_summary</field>
+        <field name='name'>toggl.yesterday_summary</field>
     </record>
 
-    <menuitem id='toggl_menu' parent='base.menu_main_pm' name='Toggl'/>
-    <menuitem id='toggl_summary' parent='toggl_menu' name='Daily Summary'/>
-    <menuitem id='toggl_dashboard' parent='toggl_menu' name='Dashboard'/>
+    <template id="summary">
+        <t t-name="toggl.summary">
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+            <div class="container">
+                <h1>Toggl Daily Summary</h1>
+                <t t-foreach="summary" t-as="user_data"> 
+                    <h3><span class="glyphicon glyphicon-user"/> <t t-esc="user_data['user']"/> <t t-esc="user_data['total_time']"/></h3>
+                    <table class="table table-striped">
+                        <tbody>
+                            <t t-foreach="user_data['time_entries']" t-as="time_entry"> 
+                                <tr>
+                                    <td><t t-esc="time_entry['entry']"/></td>
+                                    <td><t t-esc="time_entry['time']"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>                
+            </div>
+        </t>
+    </template>
 
 
-<template id="summary">
-    <t t-name="toggl.summary">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
-        <div class="container">
-            <h1>Toggl Daily Summary</h1>
-            <t t-foreach="summary" t-as="user_data"> 
-                <h3><span class="glyphicon glyphicon-user"/> <t t-esc="user_data['user']"/> <t t-esc="user_data['total_time']"/></h3>
+    <record id='toggl_current_report' model='ir.actions.report.xml'>
+        <field name='model'>report.toggl.current</field>
+        <field name='report_type'>qweb-html</field>
+        <field name='report_name'>toggl.current</field>
+        <field name='name'>toggl.current</field>
+    </record>
+
+    <template id="current">
+        <t t-name="toggl.current">
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+            <div class="container">
+                <h1><span class="glyphicon glyphicon-th-list"/> Toggl Current Tasks</h1>            
                 <table class="table table-striped">
+                    <thead>
+                        <th>User</th>
+                        <th>Task</th>
+                        <th>Started</th>
+                        <th>Duration</th>
+                        <th>State</th>
+                    </thead>
                     <tbody>
-                        <t t-foreach="user_data['time_entries']" t-as="time_entry"> 
+                        <t t-foreach="current" t-as="o"> 
                             <tr>
-                                <td><t t-esc="time_entry['entry']"/></td>
-                                <td><t t-esc="time_entry['time']"/></td>
+                                <td><t t-esc="o['user']"/></td>
+                                <td><t t-esc="o['description']"/></td>
+                                <td><t t-esc="o['start']"/></td>
+                                <td><t t-esc="o['duration']"/></td>
+                                <td><t t-esc="o['state']"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>         
+            </div>
+        </t>
+    </template>
+
+
+    <record id='toggl_dashboard_report' model='ir.actions.report.xml'>
+            <field name='model'>report.toggl.dashboard</field>
+            <field name='report_type'>qweb-html</field>
+            <field name='report_name'>toggl.dashboard</field>
+            <field name='name'>toggl.dashboard</field>
+    </record>
+
+    <template id="dashboard">
+        <t t-name="toggl.dashboard">
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+            <div class="container">
+                <h1><span class="glyphicon glyphicon-th-list"/> Toggl Dashboard</h1>            
+                <table class="table table-striped">
+                    <thead>
+                        <th>User</th>
+                        <th>Project</th>
+                        <th>Description</th>
+                        <th>Duration</th>
+                        <th>Stop</th>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="dashboard" t-as="d"> 
+                            <tr>
+                                <td><t t-esc="d['user']"/></td>
+                                <td><t t-esc="d['project']"/></td>
+                                <td><t t-esc="d['description']"/></td>
+                                <td><t t-esc="d['duration']"/></td>
+                                <td><t t-esc="d['stop']"/></td>
                             </tr>
                         </t>
                     </tbody>
                 </table>
-            </t>                
-        </div>
-    </t>
-</template>
+            </div>
+        </t>
+    </template>
 
+    <menuitem id='toggl_menu' parent='base.menu_main_pm' name='Toggl' groups='project.group_project_user'/>
+    
+    <record id='toggl_dashboard_menu' model='ir.ui.menu'>
+        <field name='name'>Dashboard</field>
+        <field name='sequence'>20</field>
+        <field name='parent_id' ref='toggl.toggl_menu'/>
+        <field name='action' ref="toggl.toggl_dashboard_report"/>
+    </record>
+    <record id='toggl_current_menu' model='ir.ui.menu'>
+        <field name='name'>Current</field>
+        <field name='sequence'>10</field>
+        <field name='parent_id' ref='toggl.toggl_menu'/>
+        <field name='action' ref="toggl.toggl_current_report"/>
+    </record>
+    <record id='toggl_day_summary_menu' model='ir.ui.menu'>
+        <field name='name'>Day Summary</field>
+        <field name='sequence'>30</field>
+        <field name='parent_id' ref='toggl.toggl_menu'/>
+        <field name='action' ref="toggl.toggl_day_summary_report"/>
+    </record>
+    <record id='toggl_yesterday_summary_menu' model='ir.ui.menu'>
+        <field name='name'>Yesterday Summary</field>
+        <field name='sequence'>40</field>
+        <field name='parent_id' ref='toggl.toggl_menu'/>
+        <field name='action' ref="toggl.toggl_yesterday_summary_report"/>
+    </record>
 
-<record id='toggl_dashboard_report' model='ir.actions.report.xml'>
-        <field name='model'>report.toggl.dashboard</field>
-        <field name='report_type'>qweb-html</field>
-        <field name='report_name'>toggl.dashboard</field>
-        <field name='name'>toggl.dashboard</field>
-</record>
+    <!--
+    <menuitem id='toggl_summary' parent='toggl_menu' name='Daily Summary' sequence='30' groups='project.group_project_user'/>
+    <menuitem id='toggl_dashboard' parent='toggl_menu' name='Dashboard' sequence='20' groups='project.group_project_user'/>
+    <menuitem id='toggl_current' parent='toggl_menu' name='Current' sequence='10' groups='project.group_project_user' action=''/>
+    -->
 
-<template id="dashboard">
-    <t t-name="toggl.dashboard">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
-        <div class="container">
-            <h1><span class="glyphicon glyphicon-th-list"/> Toggl Dashboard</h1>            
-            <table class="table table-striped">
-                <thead>
-                    <th>User</th>
-                    <th>Project</th>
-                    <th>Description</th>
-                    <th>Duration</th>
-                    <th>Stop</th>
-                </thead>
-                <tbody>
-                    <t t-foreach="dashboard" t-as="d"> 
-                        <tr>
-                            <td><t t-esc="d['user']"/></td>
-                            <td><t t-esc="d['project']"/></td>
-                            <td><t t-esc="d['description']"/></td>
-                            <td><t t-esc="d['duration']"/></td>
-                            <td><t t-esc="d['stop']"/></td>
-                        </tr>
-                    </t>
-                </tbody>
-            </table>
-        </div>
-    </t>
-</template>
+    <record id='res_users_toggl_key' model='ir.ui.view'>
+        <field name='name'>Toggle API Key</field>
+        <field name='model'>res.users</field>
+        <field name='inherit_id' ref='base.view_users_form'/>
+        <field name='arch' type='xml'>
+            <data>
+                <group name='preferences' position='after'>
+                    <group name='toggl' string='Toggl'>
+                        <field name='toggl_key' class='oe_inline'/>
+                    </group>
+                </group>
+            </data>
+        </field>
+    </record>
 
 
 </data>

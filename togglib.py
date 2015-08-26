@@ -3,6 +3,7 @@ import logging
 import sys
 import json
 from datetime import date, timedelta
+import time
 import re
 
 logging.basicConfig()
@@ -21,10 +22,6 @@ TASKS = 'https://www.toggl.com/api/v8/workspaces/%s/tasks' % WORKSPACE
 TODAY_SUMMARY = 'https://toggl.com/reports/api/v2/summary?workspace_id=%(workspace)s&since=%(today)s&user_agent=test'\
                 '&grouping=users&subgroupings=time_entries'
 
-
-user_ids = {}
-project_ids = {}
-
 AUTH = (api_token, 'api_token')
 
 def req(url):
@@ -35,7 +32,17 @@ def req(url):
     else:
         return None
 
+
+def format_time(t):
+    if not t or not re_date.search(t):
+        return '0:00:00'
+    else:
+        return re_date.search(t).group(1)
+
+
 def get_dashboard():
+    user_ids = {}
+    project_ids = {}
     data = []
     dash = req(DASHBOARD)
     users = req(WORKSPACE_USERS)
@@ -47,15 +54,13 @@ def get_dashboard():
         project_ids[proj['id']] = proj['name']
 
     for a in dash['activity']:
-        duration = int(a['duration'])
-        if duration < 0:
-            duration = 0
+        duration = abs(int(a['duration']))
         data.append({
             'user': user_ids[a['user_id']],
             'project': project_ids[a['project_id']] if a['project_id'] else '',
             'description': a['description'],
             'duration': str(timedelta(seconds=duration)),
-            'stop': a['stop'] and re_date.search(a['stop']) and re_date.search(a['stop']).group(1) or '',
+            'stop': format_time(a['stop']),
             })
     # We've got timeline from new to old, reverse it.
     data.reverse()
@@ -80,7 +85,38 @@ def get_summary(day):
     return data
 
 
+def get_current(api_token):
+    r = requests.get('https://www.toggl.com/api/v8/time_entries/current',
+                     auth=(api_token, 'api_token'))
+    if r.status_code == 200:
+        data = r.json()['data']
+        if not data:
+            return {
+                'duration': '0:00',
+                'description': 'No data',
+                'start': '0:00:00',
+                'state': 'Error'
+            }
+        description = data['description']
+        # Format duration
+        duration = int(data['duration'])
+        duration = int(data['duration'])
+        state = 'Running' if duration < 0 else 'Stopped'
+        duration = abs(duration)
+        duration = int(time.time()) - duration
+        duration = str(timedelta(seconds=duration))
+
+        start = format_time(data['start'])
+        
+        return {
+            'description': description,
+            'duration': duration,
+            'start': start,
+            'state': state
+        }
+    else:
+        return 'Error code: %s' % r.status_code
+
+
 if __name__ == '__main__':
-    d =  get_dashboard()
-    for l in d:
-        print l['description'], l['duration'], l['stop']
+    print json.dumps(get_current('aa2520b5583e11b421e7d0c203978a43'), indent=4)
