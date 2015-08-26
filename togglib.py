@@ -100,10 +100,10 @@ def get_current(api_token):
         data = r.json()['data']
         if not data:
             return {
-                'duration': '0:00',
-                'description': 'No data',
-                'start': '0:00:00',
-                'state': 'Error'
+                'duration': '',
+                'description': '',
+                'start': '',
+                'state': 'Not running'
             }
         description = data['description']
         state = 'Running' if int(data['duration']) < 0 else 'Stopped'
@@ -123,4 +123,4 @@ def get_current(api_token):
 
 if __name__ == '__main__':
     #print json.dumps(get_current('aa2520b5583e11b421e7d0c203978a43'), indent=4)
-    print get_summary('2015-08-25')
+    print json.dumps(get_summary('2015-08-25'), indent=4)
