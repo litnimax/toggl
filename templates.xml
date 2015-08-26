@@ -14,12 +14,35 @@
         <field name='report_name'>toggl.day_summary</field>
         <field name='name'>toggl.day_summary</field>
     </record>
+
     <record id='toggl_yesterday_summary_report' model='ir.actions.report.xml'>
         <field name='model'>report.toggl.yesterday_summary</field>
         <field name='report_type'>qweb-html</field>
         <field name='report_name'>toggl.yesterday_summary</field>
         <field name='name'>toggl.yesterday_summary</field>
     </record>
+
+    <template id="summary">
+        <t t-name="toggl.summary">
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+            <div class="container">
+                <h1>Toggl Daily Summary</h1>
+                <t t-foreach="summary" t-as="user_data"> 
+                    <h3><span class="glyphicon glyphicon-user"/> <t t-esc="user_data['user']"/> <t t-esc="user_data['total_time']"/></h3>
+                    <table class="table table-striped">
+                        <tbody>
+                            <t t-foreach="user_data['time_entries']" t-as="time_entry"> 
+                                <tr>
+                                    <td><t t-esc="time_entry['entry']"/></td>
+                                    <td><t t-esc="time_entry['time']"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>                
+            </div>
+        </t>
+    </template>
 
 
     <record id='toggl_current_report' model='ir.actions.report.xml'>
